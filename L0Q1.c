@@ -19,12 +19,12 @@ void convStrNum2 (char** stringPonto, double* num);
 double convStrNum(char* stringPonto, int* idx);
 void atribuirCoordenadasPonto(Ponto* structPonto, char* stringPonto, int* idx);
 void proximoNumOuSinal (char** string);
-char* obterSubstring(char* stringPonto, char separador, int* idx);
+char* obterSubstring(char* stringPonto, char separador, int idx);
 char* obter_substring(char** stringPonto, char separador);
 Ponto criarPonto0();
 
 int main(){
-    printf("I'M ALIVE");
+
     // Armazenando os arquivos de entrada e saida em variaveis:
     FILE *entrada = fopen("L0Q1.in", "r");
     FILE *saida = fopen("L0Q1.out", "w");
@@ -42,7 +42,6 @@ int main(){
     int idx = 0;
     fgets(linha, TAM_MAX_LINHA, entrada);
     atribuirCoordenadasPonto(&ponto_teste, linha, &idx);
-    printf("VEJA:%s", ponto_teste.coordenadaPonto);
     //
     
     while(fgets(linha, TAM_MAX_LINHA,  entrada) != NULL){
@@ -55,6 +54,12 @@ int main(){
     return 1;
 }
 
+void proximaCoordenada(char* stringPonto, int* idx)
+{
+    while (stringPonto[*idx] != '(')
+        *idx += 1;
+}
+
 // função para atribuir propriedades x e y de um ponto com base
 // numa string no formato: "(x, y)"
 void atribuirCoordenadasPonto(Ponto* structPonto, char* stringPonto, int* idx)
@@ -63,47 +68,45 @@ void atribuirCoordenadasPonto(Ponto* structPonto, char* stringPonto, int* idx)
     structPonto->x = 0;
     structPonto->y = 0;
 
-    while (stringPonto[*idx] != '(')
-        *idx += 1;
-
-    printf("%s", stringPonto);
+    proximaCoordenada(stringPonto, idx);
     
-    int idx_a = *idx + 1;
     //structPonto->coordenadaPonto = obterSubstring(stringPonto, ')', idx);
-    structPonto->coordenadaPonto = obterSubstring(stringPonto, ')', idx);
-    
-    *idx += 1;
+    structPonto->coordenadaPonto = obterSubstring(stringPonto, ')', *idx);
+
     // para o x:
-    structPonto->x = convStrNum(stringPonto, &idx_a);
+    *idx += 1; // incrementa em 1 pois parou no '('
+    structPonto->x = convStrNum(stringPonto, idx);
 
-    printf("X: %lf|", structPonto->x);
     // para o y:
-    idx_a++;
-    structPonto->y = convStrNum(stringPonto, &idx_a);
-    printf("Y: %lf|", structPonto->y);
+    *idx += 1; // incremente em 1 pois parou no ','
+    structPonto->y = convStrNum(stringPonto, idx);
     
-  //  Ponto ponto0 = criarPonto0();stringPonto
+    Ponto ponto0 = criarPonto0();
 
-   //structPonto->distanciaOrigem = calcularDistanciaPontos(*structPonto, ponto0);
+    structPonto->distanciaOrigem = calcularDistanciaPontos(*structPonto, ponto0);
 
+    // testando output
+    printf("\nX: %lf;", structPonto->x);
+    printf("\nY: %lf;", structPonto->y);
+    printf("\nDistância: %lf;", structPonto->distanciaOrigem);
+    printf("\nSubstring: %s.\n", structPonto->coordenadaPonto);
+    //
 }
 
 
 // obtém a substring equivalente ao início da string passada até o separador
-char* obterSubstring(char* stringPonto, char separador, int* idx)
+char* obterSubstring(char* stringPonto, char separador, int idx)
 {
     int i;
 
-    for (i = *idx; stringPonto[i] != separador; i++);
+    for (i = idx; stringPonto[i] != separador; i++);
 
-    char* substring = (char*) malloc(sizeof(char) * ((++i - *idx) + 1));
+    char* substring = (char*) malloc(sizeof(char) * ((++i - idx) + 1));
 
-    for (i = *idx; stringPonto[i] != separador; i++)
-        substring[i - *idx] = stringPonto[i];
+    for (i = idx; stringPonto[i] != separador; i++)
+        substring[i - idx] = stringPonto[i];
 
-    substring[(i - *idx)] = stringPonto[i];
-
-    *idx = i;
+    substring[(i - idx)] = stringPonto[i];
 
     return substring;
 }
@@ -158,11 +161,8 @@ double convStrNum (char* stringPonto, int* idx)
 
     double div = (double) 10.0;
 
-    printf("ATYAL: %c", stringPonto[*idx]);
-
     while ((stringPonto[*idx] > 47 && stringPonto[*idx] < 58) || stringPonto[*idx] == '-' || stringPonto[*idx] == '.')
     {
-        printf("double: %lf\n", retorno);
         if(stringPonto[*idx] == '-')
         {
             retorno += (double) ((stringPonto[*idx + 1] - 48) * -1);
@@ -236,14 +236,9 @@ void convStrNum2 (char** stringPonto, double* num)
 
 void proximoNumOuSinal (char** string)
 {
-    printf("\nANTES: %s\n", *(string));
-
     // avança até o próximo número ou sinal numérico
     while ((*(*(string) + sizeof(char)) < 48 || *(*(string) + sizeof(char)) > 57) && (*(*(string) + sizeof(char)) != '-'))
         *(string) += sizeof(char);
-
-    printf("OI: %d", **(string));
-    printf("\nGRANDE TESTE: %s\n", *(string));
 }
 
 // Função para calcular distância entre pontos - basta passar o ponto0 para calcular
