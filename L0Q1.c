@@ -41,12 +41,13 @@ Ponto criarPonto0();
 Ponto* adicionarPontoLista(Ponto* pontoInicio, Ponto* novoPonto);
 int atribuirCoordenadasPonto(Ponto* structPonto, char* stringPonto, int* idx);
 double calcularDistanciaPontos(Ponto ponto1, Ponto ponto2);
+Ponto* obterPontoLista(char* linha, int* idx);
 
 #pragma endregion
 
 #endif
 
-#pragma region MAIN 
+#pragma region PRINCIPAL 
 
 int main(){
 
@@ -77,6 +78,36 @@ int main(){
     fclose(saida);
 
     return 1;
+}
+
+// Gerencia a lógica do programa para a linha atual
+void gerenciarLinha (char* linha)
+{
+    // indexador
+    int idx = 0; 
+    
+    // obtém a lista de pontos da entrada
+    Ponto* pontoInicio = obterPontoLista(linha, &idx); 
+}
+
+Ponto* obterPontoLista(char* linha, int* idx)
+{
+    Ponto* pontoInicio = (Ponto*) malloc(sizeof(Ponto));
+    pontoInicio->prox = NULL;
+
+    // verifica se há pelo menos um ponto e atribui como inicial
+    if (atribuirCoordenadasPonto(pontoInicio, linha, idx) == false) 
+        return NULL;
+
+    // adiciona novos pontos na lista enquanto for possível atribuir - a linha não terminar, por exemplo
+    Ponto* novoPonto = (Ponto*) malloc(sizeof (Ponto));
+    while(atribuirCoordenadasPonto(novoPonto, linha, idx) == true)
+    {
+        pontoInicio = adicionarPontoLista(pontoInicio, novoPonto);
+        novoPonto = (Ponto*) malloc (sizeof(Ponto));
+    }
+    
+    return pontoInicio;
 }
 
 #pragma endregion
@@ -141,6 +172,8 @@ int atribuirCoordenadasPonto(Ponto* structPonto, char* stringPonto, int* idx)
     printf("\nDistância: %lf;", structPonto->distanciaOrigem);
     printf("\nSubstring: %s.\n", structPonto->coordenadaPonto);
     //
+    
+    return true;
 }
 
 #pragma endregion
