@@ -8,26 +8,45 @@
 
 #define TAM_MAX_LINHA 1000
 
-// estruturas
-typedef struct{
+#define false (0)
+#define true (1)
+
+#pragma region STRUTURAS
+
+typedef struct ponto Ponto;
+
+struct ponto {
     char *coordenadaPonto;
     float distanciaOrigem;
     // cálculo de distância
     double x; 
     double y;
-} Ponto;
+    // encadeamento
+    Ponto* prox;
+    Ponto* ant;
+};
 
-// funções
-double calcularDistanciaPontos(Ponto ponto1, Ponto ponto2);
-void convStrNum2 (char** stringPonto, double* num);
+#pragma endregion
+
+#pragma region FUNÇÕES
+
+// relacionadas à strings
 double convStrNum(char* stringPonto, int* idx);
-void atribuirCoordenadasPonto(Ponto* structPonto, char* stringPonto, int* idx);
 void proximoNumOuSinal (char** string);
 char* obterSubstring(char* stringPonto, char separador, int idx);
-char* obter_substring(char** stringPonto, char separador);
+int proximaCoordenada(char* stringPonto, int* idx);
+
+// relacionadas à estrutura de pontos
 Ponto criarPonto0();
+Ponto* adicionarPontoLista(Ponto* pontoInicio, Ponto* novoPonto);
+int atribuirCoordenadasPonto(Ponto* structPonto, char* stringPonto, int* idx);
+double calcularDistanciaPontos(Ponto ponto1, Ponto ponto2);
+
+#pragma endregion
 
 #endif
+
+#pragma region MAIN 
 
 int main(){
 
@@ -60,21 +79,46 @@ int main(){
     return 1;
 }
 
-void proximaCoordenada(char* stringPonto, int* idx)
+#pragma endregion
+
+#pragma region PONTOS
+
+// insere um ponto na lista retornando o novo início
+Ponto* adicionarPontoLista (Ponto* pontoInicio, Ponto* novoPonto)
 {
-    while (stringPonto[*idx] != '(')
-        *idx += 1;
+    // encadeamento
+    pontoInicio->ant = novoPonto;
+    novoPonto->prox = pontoInicio;
+
+    // deve-se tornar o pontoInicio igual a este através do retorno
+    return novoPonto; 
 }
+
+// Função para calcular distância entre pontos - basta passar o ponto0 para calcular
+// distância até a origem
+double calcularDistanciaPontos(Ponto ponto1, Ponto ponto2)
+{
+    return sqrt(pow((ponto1.y - ponto2.y), 2) + pow((ponto1.x - ponto2.x), 2));
+};
+
+// Cria o ponto 0
+Ponto criarPonto0()
+{
+    Ponto ponto0;
+    ponto0.x = 0; ponto0.y = 0;
+    return ponto0;
+};
 
 // função para atribuir propriedades x e y de um ponto com base
 // numa string no formato: "(x, y)"
-void atribuirCoordenadasPonto(Ponto* structPonto, char* stringPonto, int* idx)
+int atribuirCoordenadasPonto(Ponto* structPonto, char* stringPonto, int* idx)
 {
     // inicializa / zera x e y do ponto
     structPonto->x = 0;
     structPonto->y = 0;
 
-    proximaCoordenada(stringPonto, idx);
+    if (proximaCoordenada(stringPonto, idx) == false)
+        return false;
     
     //structPonto->coordenadaPonto = obterSubstring(stringPonto, ')', idx);
     structPonto->coordenadaPonto = obterSubstring(stringPonto, ')', *idx);
@@ -99,41 +143,56 @@ void atribuirCoordenadasPonto(Ponto* structPonto, char* stringPonto, int* idx)
     //
 }
 
-void lerLinha(Ponto* listaPontos, char* linha)
+#pragma endregion
+
+#pragma region FUNÇÕES STRING
+
+// passa o indexador para a próxima coordenada ou final de linha
+int proximaCoordenada(char* stringPonto, int* idx)
 {
-    int idx = 0; // indexador
+    // encontra próxima coordenada ou o final da linha
+    while (stringPonto[*idx] != '(' && stringPonto[*idx] != '\n')
+        *idx += 1;
     
-}
+    // verifica se a linha acabou
+    if (stringPonto[*idx] == '\n')
+        return false;
+    else
+        return true;
+};
 
 // obtém a substring equivalente ao início da string passada até o separador
 char* obterSubstring(char* stringPonto, char separador, int idx)
 {
     int i;
 
-    for (i = idx; stringPonto[i] != separador; i++);
+    for (i = idx; stringPonto[i] != separador; i++); // encontra o tamanho
 
-    char* substring = (char*) malloc(sizeof(char) * ((++i - idx) + 1));
+    char* substring = (char*) malloc(sizeof(char) * ((++i - idx) + 1)); // aloca retorno
 
     for (i = idx; stringPonto[i] != separador; i++)
-        substring[i - idx] = stringPonto[i];
+        substring[i - idx] = stringPonto[i]; // copia até o separador
 
-    substring[(i - idx)] = stringPonto[i];
+    substring[(i - idx)] = stringPonto[i]; // último char, ainda que seja o separador
+    substring[(i - idx) + 1] = '\0'; // terminador nulo no final
 
-    return substring;
+    return substring; // retorna a substring
 }
 
 double convStrNum (char* stringPonto, int* idx)
 {
-    double retorno = 0;
+    double retorno = 0; // retorno
 
-    int decimal = 0;
+    int decimal = 0; // bool para saber se estamos à direita ou esquerda da vírgula
 
-    double div = (double) 10.0;
+    double div = (double) 10.0; // controlador da casa decimal da parte fracionária
 
+    // enquanto o conteúdo da posição atual do indexador for número ASCII, ponto ou sinal de número negativo
     while ((stringPonto[*idx] > 47 && stringPonto[*idx] < 58) || stringPonto[*idx] == '-' || stringPonto[*idx] == '.')
     {
         if(stringPonto[*idx] == '-')
         {
+            // torna o número negativo e passa o indexador para a próxima casa significativa
             retorno += (double) ((stringPonto[*idx + 1] - 48) * -1);
             *idx += 2;
             continue;
@@ -141,24 +200,29 @@ double convStrNum (char* stringPonto, int* idx)
         
         if(stringPonto[*idx] == '.')
         {
+            // tratar char recebido como casa à direita da vírgula e acrescer indexador
             decimal = 1;
             *idx += 1;
         }
 
         if (decimal)
         {
+            // soma ou subtrai a depender do valor de retorno em um número
+            // na casa decimal atual - controlada pela variável div
             retorno += retorno > 0 ? ((double) (stringPonto[*idx] - 48))/div : ((double) ((48 - stringPonto[*idx]) * -1))/div;
             div *= (double) 10.0;
         }
         else 
         {
+            // acresce a casa atual do retorno e soma com o número da posição atual do indexador 
+            retorno *= 10;
             retorno += retorno >= 0 ? ((double) (stringPonto[*idx] - 48)) : ((double) ((stringPonto[*idx] - 48) * -1));
         }
 
-        *idx += 1;
+        *idx += 1; // incrementa o indexador
     }
 
-    return retorno;
+    return retorno; // retorna o número equivalente àquele trecho
 }
 
 // ela vai até o primeiro sinal ou número, vai acrescendo um número que, se vier como 0, será equivalente
@@ -172,17 +236,4 @@ void proximoNumOuSinal (char** string)
 }
 */
 
-// Função para calcular distância entre pontos - basta passar o ponto0 para calcular
-// distância até a origem
-double calcularDistanciaPontos(Ponto ponto1, Ponto ponto2)
-{
-    return sqrt(pow((ponto1.y - ponto2.y), 2) + pow((ponto1.x - ponto2.x), 2));
-};
-
-// Cria o ponto 0
-Ponto criarPonto0()
-{
-    Ponto ponto0;
-    ponto0.x = 0; ponto0.y = 0;
-    return ponto0;
-}
+#pragma endregion
