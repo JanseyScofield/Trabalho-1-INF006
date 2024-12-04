@@ -99,6 +99,11 @@ void atribuirCoordenadasPonto(Ponto* structPonto, char* stringPonto, int* idx)
     //
 }
 
+void lerLinha(Ponto* listaPontos, char* linha)
+{
+    int idx = 0; // indexador
+    
+}
 
 // obtém a substring equivalente ao início da string passada até o separador
 char* obterSubstring(char* stringPonto, char separador, int idx)
