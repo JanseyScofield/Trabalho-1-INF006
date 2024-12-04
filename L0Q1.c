@@ -30,18 +30,23 @@ struct ponto {
 
 #pragma region FUNÇÕES
 
+// principal
+void gerenciarLinha (char* linha);
+
 // relacionadas à strings
 double convStrNum(char* stringPonto, int* idx);
 void proximoNumOuSinal (char** string);
 char* obterSubstring(char* stringPonto, char separador, int idx);
 int proximaCoordenada(char* stringPonto, int* idx);
+// teste
+void imprimirCoordenadas (Ponto* pontoAtual);
 
 // relacionadas à estrutura de pontos
 Ponto criarPonto0();
 Ponto* adicionarPontoLista(Ponto* pontoInicio, Ponto* novoPonto);
 int atribuirCoordenadasPonto(Ponto* structPonto, char* stringPonto, int* idx);
 double calcularDistanciaPontos(Ponto ponto1, Ponto ponto2);
-Ponto* obterPontoLista(char* linha, int* idx);
+Ponto* obterPontosLista(char* linha, int* idx);
 
 #pragma endregion
 
@@ -64,13 +69,16 @@ int main(){
     char *linha = malloc(TAM_MAX_LINHA * sizeof(char));
     
     // teste
+    /*
     Ponto ponto_teste;
     int idx = 0;
     fgets(linha, TAM_MAX_LINHA, entrada);
     atribuirCoordenadasPonto(&ponto_teste, linha, &idx);
+    */
     //
     
     while(fgets(linha, TAM_MAX_LINHA,  entrada) != NULL){
+        gerenciarLinha(linha);
         fputs(linha, saida);
     }
 
@@ -87,10 +95,14 @@ void gerenciarLinha (char* linha)
     int idx = 0; 
     
     // obtém a lista de pontos da entrada
-    Ponto* pontoInicio = obterPontoLista(linha, &idx); 
+    Ponto* pontoInicio = obterPontosLista(linha, &idx); 
+    
+    // teste
+    imprimirCoordenadas(pontoInicio);
+    //
 }
 
-Ponto* obterPontoLista(char* linha, int* idx)
+Ponto* obterPontosLista(char* linha, int* idx)
 {
     Ponto* pontoInicio = (Ponto*) malloc(sizeof(Ponto));
     pontoInicio->prox = NULL;
@@ -112,7 +124,7 @@ Ponto* obterPontoLista(char* linha, int* idx)
 
 #pragma endregion
 
-#pragma region PONTOS
+#pragma region FUNÇÕES PONTOS
 
 // insere um ponto na lista retornando o novo início
 Ponto* adicionarPontoLista (Ponto* pontoInicio, Ponto* novoPonto)
@@ -166,13 +178,6 @@ int atribuirCoordenadasPonto(Ponto* structPonto, char* stringPonto, int* idx)
 
     structPonto->distanciaOrigem = calcularDistanciaPontos(*structPonto, ponto0);
 
-    // testando output
-    printf("\nX: %lf;", structPonto->x);
-    printf("\nY: %lf;", structPonto->y);
-    printf("\nDistância: %lf;", structPonto->distanciaOrigem);
-    printf("\nSubstring: %s.\n", structPonto->coordenadaPonto);
-    //
-    
     return true;
 }
 
@@ -257,6 +262,17 @@ double convStrNum (char* stringPonto, int* idx)
 
     return retorno; // retorna o número equivalente àquele trecho
 }
+
+// teste
+void imprimirCoordenadas (Ponto* pontoAtual)
+{
+    while (pontoAtual != NULL)
+    {
+        printf("%s\n", pontoAtual->coordenadaPonto);
+        pontoAtual = pontoAtual->prox;
+    }
+}
+//
 
 // ela vai até o primeiro sinal ou número, vai acrescendo um número que, se vier como 0, será equivalente
 // ao double
