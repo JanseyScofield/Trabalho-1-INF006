@@ -1,7 +1,11 @@
+#ifndef L0Q1_H
+#define L0Q1_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+
 #define TAM_MAX_LINHA 1000
 
 // estruturas
@@ -22,6 +26,8 @@ void proximoNumOuSinal (char** string);
 char* obterSubstring(char* stringPonto, char separador, int idx);
 char* obter_substring(char** stringPonto, char separador);
 Ponto criarPonto0();
+
+#endif
 
 int main(){
 
