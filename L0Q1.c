@@ -117,48 +117,6 @@ char* obterSubstring(char* stringPonto, char separador, int idx)
     return substring;
 }
 
-/*
-char* obter_substring(char** stringPonto, char separador)
-{
-    int i;
-    for (i = 0; (char) *(*(stringPonto) + (sizeof(char) * (i))) != separador; i++);
-    printf("\n: %d\n", i);
-    char* substring = (char*) malloc(sizeof(char) * (i + 1));
-    for (i = 0; (char) *(*(stringPonto) + (sizeof(char) * i)) != separador; i++)
-    {
-        *(substring + i) = (char) *(*(stringPonto) + (sizeof(char) * i));
-        *stringPonto += sizeof(char);
-    }
-
-    return (char*) substring;
-}
-*/
-
-// função que obtém substring '(x, y)' 
-/*
-char* obterSubstring(char** stringPonto, char separador)
-{
-    int qnt = 1;
-    proximoNumOuSinal(stringPonto);
-    
-    *stringPonto -= sizeof(char);
-    
-    while(*(*(stringPonto) + (sizeof(char) * qnt)) != separador)
-        qnt++;
-
-    char* substring = (char*) malloc(sizeof(char) * (qnt + 1));
-    
-    for (int i = 0; i < qnt; i++)
-    {
-        *(substring + (sizeof(char) * i)) = *(*(stringPonto) + (sizeof(char) * i));
-    }
-    
-    *(substring + (sizeof(char) * (qnt + 1))) = '\0';
-    
-    return substring;
-}
-*/
-
 double convStrNum (char* stringPonto, int* idx)
 {
     double retorno = 0;
@@ -201,51 +159,13 @@ double convStrNum (char* stringPonto, int* idx)
 // ela vai até o primeiro sinal ou número, vai acrescendo um número que, se vier como 0, será equivalente
 // ao double
 /*
-void convStrNum2 (char** stringPonto, double* num)
-{
-    // verificar decimal
-    int decimal = 0;
-    
-    // divisor para a parte decimal
-    float div = (float) 10;
-    
-    // converte até encontrar caracter não numérico / sinal numérico
-    while (((**(stringPonto) > 47 && **(stringPonto) < 59) || (**(stringPonto) == '-') || (**(stringPonto) == '.'))) 
-    {
-        if (**(stringPonto) == '-') // número é negativo
-        {
-            *(stringPonto) += sizeof(char);
-            *(num) += (double) ((-1 * (**(stringPonto))) - 48);
-        }
-        
-        if (**(stringPonto) == '.')
-        {
-            decimal = 1; // a partir deste momento os valores devem estar após a vírgula
-            *(stringPonto) += sizeof(char);
-        }
-        
-        if (decimal)
-        {
-            *(num) += *(num) > 0 ? ((double) (**(stringPonto) - 48))/div : ((double) ((**(stringPonto) * -1) - 48))/div; // soma ou subtrai valor na casa adequada
-            div *= 10; // próximo char representa número de casa mais à esquerda
-        }
-        else
-        {
-            *(num) *= 10; // ordem do algarismo anterior acrescida
-            *(num) += *(num) > 0 ? (double) (**(stringPonto) - 48) : (double)((-1 * (**(stringPonto))) - 48); // soma ou subtrai a depender do sinal
-        }
-        
-        *(stringPonto) += sizeof(char); // indexador para o próximo caracter
-    }
-}
-*/
-
 void proximoNumOuSinal (char** string)
 {
     // avança até o próximo número ou sinal numérico
     while ((*(*(string) + sizeof(char)) < 48 || *(*(string) + sizeof(char)) > 57) && (*(*(string) + sizeof(char)) != '-'))
         *(string) += sizeof(char);
 }
+*/
 
 // Função para calcular distância entre pontos - basta passar o ponto0 para calcular
 // distância até a origem
@@ -254,6 +174,7 @@ double calcularDistanciaPontos(Ponto ponto1, Ponto ponto2)
     return sqrt(pow((ponto1.y - ponto2.y), 2) + pow((ponto1.x - ponto2.x), 2));
 };
 
+// Cria o ponto 0
 Ponto criarPonto0()
 {
     Ponto ponto0;
