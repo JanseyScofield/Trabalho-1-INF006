@@ -14,14 +14,18 @@
 #pragma region STRUTURAS
 
 typedef struct ponto Ponto;
+typedef struct infoPonto InfoPonto;
 
-struct ponto {
-    char *coordenadaPonto;
+struct infoPonto {
+    char* coordenadaPonto;
     float distanciaOrigem;
     // cálculo de distância
-    double x; 
+    double x;
     double y;
-    // encadeamento
+};
+
+struct ponto {
+    InfoPonto info;
     Ponto* prox;
     Ponto* ant;
 };
@@ -47,6 +51,7 @@ Ponto* adicionarPontoLista(Ponto* pontoInicio, Ponto* novoPonto);
 int atribuirCoordenadasPonto(Ponto* structPonto, char* stringPonto, int* idx);
 double calcularDistanciaPontos(Ponto ponto1, Ponto ponto2);
 Ponto* obterPontosLista(char* linha, int* idx);
+void quickPontos (Ponto* pontoInicio, Ponto* pontoFinal); 
 
 #pragma endregion
 
@@ -141,14 +146,14 @@ Ponto* adicionarPontoLista (Ponto* pontoInicio, Ponto* novoPonto)
 // distância até a origem
 double calcularDistanciaPontos(Ponto ponto1, Ponto ponto2)
 {
-    return sqrt(pow((ponto1.y - ponto2.y), 2) + pow((ponto1.x - ponto2.x), 2));
+    return sqrt(pow((ponto1.info.y - ponto2.info.y), 2) + pow((ponto1.info.x - ponto2.info.x), 2));
 };
 
 // Cria o ponto 0
 Ponto criarPonto0()
 {
     Ponto ponto0;
-    ponto0.x = 0; ponto0.y = 0;
+    ponto0.info.x = 0; ponto0.info.y = 0;
     return ponto0;
 };
 
@@ -157,29 +162,130 @@ Ponto criarPonto0()
 int atribuirCoordenadasPonto(Ponto* structPonto, char* stringPonto, int* idx)
 {
     // inicializa / zera x e y do ponto
-    structPonto->x = 0;
-    structPonto->y = 0;
+    structPonto->info.x = 0;
+    structPonto->info.y = 0;
 
     if (proximaCoordenada(stringPonto, idx) == false)
         return false;
     
     //structPonto->coordenadaPonto = obterSubstring(stringPonto, ')', idx);
-    structPonto->coordenadaPonto = obterSubstring(stringPonto, ')', *idx);
+    structPonto->info.coordenadaPonto = obterSubstring(stringPonto, ')', *idx);
 
     // para o x:
     *idx += 1; // incrementa em 1 pois parou no '('
-    structPonto->x = convStrNum(stringPonto, idx);
+    structPonto->info.x = convStrNum(stringPonto, idx);
 
     // para o y:
     *idx += 1; // incremente em 1 pois parou no ','
-    structPonto->y = convStrNum(stringPonto, idx);
+    structPonto->info.y = convStrNum(stringPonto, idx);
     
     Ponto ponto0 = criarPonto0();
 
-    structPonto->distanciaOrigem = calcularDistanciaPontos(*structPonto, ponto0);
+    structPonto->info.distanciaOrigem = calcularDistanciaPontos(*structPonto, ponto0);
 
     return true;
 }
+
+// quick sort comum
+void quick (int vetor[], int n)
+{
+    if (n == 1)
+        return;
+    else
+    {
+        // atribuições
+        int x = vetor[0];
+        int a  = 1;
+        int b = n - 1;
+        
+        do
+        {
+            // encontra índices de interesse
+            while (vetor[a] >= x && a < n) a++;
+            while (vetor[b] < x) b--;
+            if (a < b)
+            {
+                // troca
+               int temp = vetor[a];
+               vetor[a] = vetor[b];
+               vetor[b] = temp;
+                a++; b--;
+            }
+        } while (a <= b);
+        
+        // troca o pivô
+        vetor[0] = vetor[b];
+        vetor[b] = x;
+        
+        quick(vetor, b);
+        quick(&vetor[a], n - a);
+
+    }
+}
+
+// quick adaptado para uma lista de pontos
+void quickPontosExt (Ponto* pontoInicio)
+{
+    Ponto* pontoAtual;
+
+    for (pontoAtual = pontoInicio; pontoAtual->prox != NULL; pontoAtual = pontoAtual->prox);
+
+    quickPontos(pontoInicio, pontoAtual);
+}
+
+void quickPontos (Ponto* pontoInicio, Ponto* pontoFinal) // pode começar chamando com NULL
+{
+    if (pontoInicio == pontoFinal) // equivale a dizer que estamos falando de um só elemento
+        return;
+    else
+    {
+        // atribui
+        InfoPonto info = pontoInicio->info;
+        Ponto* pontoDireita = pontoFinal;
+        Ponto* pontoEsquerda = pontoInicio->prox;
+        
+        do
+        {
+            while (info.distanciaOrigem <= pontoEsquerda->info.distanciaOrigem && pontoEsquerda->prox != NULL) pontoEsquerda = pontoEsquerda->prox;
+            while (info.distanciaOrigem > pontoDireita->info.distanciaOrigem) pontoDireita = pontoDireita->ant;
+        } while (pontoDireita != pontoEsquerda);
+    }
+}
+
+// troca dois elementos de uma lista ponto manipulando suas informações
+void trocarListaInfo(Ponto* ponto1, Ponto* ponto2)
+{
+    InfoPonto tempInfo = ponto1->info;
+    ponto1->info = ponto2->info;
+    ponto2->info = tempInfo;    
+}
+
+// trocar dois elementos de uma lista ponto manipulando seu encadeamento
+void trocarListaEncad(Ponto* ponto1, Ponto* ponto2)
+{
+    Ponto* ponto_anterior;
+    Ponto* ponto_sucessor;
+
+    // ponto1
+    ponto_anterior = ponto1->ant;
+    ponto_sucessor = ponto1->prox;
+    ponto_anterior->prox = ponto2;
+    ponto_sucessor->ant = ponto2;
+    
+    // ponto2
+    ponto_anterior = ponto2->ant;
+    ponto_sucessor = ponto2->prox;
+    ponto_anterior->prox = ponto1;
+    ponto_sucessor->ant = ponto1;
+    
+    ponto2->prox = ponto1->prox;
+    ponto2->ant = ponto1->ant;
+    
+    ponto1->prox = ponto_sucessor;
+    ponto1->ant = ponto_anterior;
+}
+
+
 
 #pragma endregion
 
@@ -268,7 +374,7 @@ void imprimirCoordenadas (Ponto* pontoAtual)
 {
     while (pontoAtual != NULL)
     {
-        printf("%s\n", pontoAtual->coordenadaPonto);
+        printf("%s\n", pontoAtual->info.coordenadaPonto);
         pontoAtual = pontoAtual->prox;
     }
 }
