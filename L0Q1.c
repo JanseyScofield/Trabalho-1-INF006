@@ -52,6 +52,9 @@ int atribuirCoordenadasPonto(Ponto* structPonto, char* stringPonto, int* idx);
 double calcularDistanciaPontos(Ponto ponto1, Ponto ponto2);
 Ponto* obterPontosLista(char* linha, int* idx);
 void quickPontos (Ponto* pontoInicio, Ponto* pontoFinal); 
+void ordernarListaPontoDistanciaSelecao(Ponto* pontoInicio);
+void trocarListaInfo(Ponto* ponto1, Ponto* ponto2);
+void trocarListaEncad(Ponto* ponto1, Ponto* ponto2);
 
 #pragma endregion
 
@@ -250,6 +253,26 @@ void quickPontos (Ponto* pontoInicio, Ponto* pontoFinal) // pode começar chaman
             while (info.distanciaOrigem > pontoDireita->info.distanciaOrigem) pontoDireita = pontoDireita->ant;
         } while (pontoDireita != pontoEsquerda);
     }
+}
+
+// ordena a lista de pontos com base na distância até a origem
+void ordernarListaPontoDistanciaSelecao(Ponto* pontoInicio)
+{
+    Ponto* iPontoAtual;
+    Ponto* jPontoAtual;
+    Ponto* pontoMenorDistancia;
+    
+    for (iPontoAtual = pontoInicio; iPontoAtual != NULL; iPontoAtual = iPontoAtual->prox)
+    {
+        pontoMenorDistancia = iPontoAtual;
+
+        for (jPontoAtual = iPontoAtual; jPontoAtual != NULL; jPontoAtual = jPontoAtual->prox)
+           if (jPontoAtual->info.distanciaOrigem < pontoMenorDistancia->info.distanciaOrigem) 
+               pontoMenorDistancia = jPontoAtual;
+
+        trocarListaInfo(iPontoAtual, pontoMenorDistancia);
+    }
+
 }
 
 // troca dois elementos de uma lista ponto manipulando suas informações
