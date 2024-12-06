@@ -12,11 +12,20 @@ typedef struct{
     double distanciaOrigem;
 } Ponto;
 
-
+#pragma region Utils
+int checarTipo(char *string);
 float stringParaNumero(char *string);
+#pragma endregion
+
+#pragma region Pontos
 double distanciaEntrePontos(Ponto a, Ponto b);
 void inicializarPonto(char *stringPonto, Ponto *ponto);
-int checarTipo(char *string);
+#pragma endregion
+
+#pragma region Sorts
+void ordenarInts(int *array, int n);
+void ordenarFloats(float *array, int n);
+#pragma endregion
 
 int main(){
 
@@ -41,9 +50,34 @@ int main(){
     //Ponto novoPonto;
     //inicializarPonto(strPonto, &novoPonto);
 
-    char *string = "-12";
-    printf("%d", checarTipo(string));
+    float array[] = {3.5,5.7, 90.0, 5.7, 12.34, 55, 67.44, -1.56 , -67, 100.12};
+    for(int i = 0; i < 10; i++){
+        printf("%.2f ", array[i]);
+    }
+    printf("\n");
+    ordenarFloats(array, 10);
+     for(int i = 0; i < 10; i++){
+        printf("%.2f ", array[i]);
+    }
+    printf("\n");
     return 1;
+}
+
+int checarTipo(char *string){
+    int iCont;
+
+    for(iCont = 0; iCont < strlen(string); iCont++){
+        if(string[iCont]  == '('){
+            return 1; // É um ponto
+        }
+        if(string[iCont] >= 'A' && string[iCont] <= 'z'){
+            return 2; // É uma string
+        }
+        if(string[iCont] == '.'){
+            return 3; // É um float
+        }
+    }
+    return 4; // É um inteiro
 }
 
 float stringParaNumero(char *string){
@@ -121,19 +155,37 @@ void inicializarPonto(char *stringPonto, Ponto *ponto){
     ponto->distanciaOrigem = distanciaEntrePontos(*ponto, origem);
 }
 
-int checarTipo(char *string){
-    int iCont;
 
-    for(iCont = 0; iCont < strlen(string); iCont++){
-        if(string[iCont]  == '('){
-            return 1; // É um ponto
+void ordenarInts(int *array, int n){
+    int iCont, jCont;
+    int key;
+
+    for(iCont = 1; iCont < n; iCont++){
+        key = array[iCont];
+        jCont = iCont - 1;
+
+        while(array[jCont] > key &&  jCont >=0){
+            array[jCont + 1] = array[jCont];
+            jCont--;
         }
-        if(string[iCont] >= 'A' && string[iCont] <= 'z'){
-            return 2; // É uma string
-        }
-        if(string[iCont] == '.'){
-            return 3; // É um float
-        }
+
+        array[jCont + 1] = key;
     }
-    return 4; // É um inteiro
+}
+
+void ordenarFloats(float *array, int n){
+    int iCont, jCont;
+    float key;
+
+    for(iCont = 1; iCont < n; iCont++){
+        key = array[iCont];
+        jCont = iCont - 1;
+
+        while(array[jCont] > key &&  jCont >=0){
+            array[jCont + 1] = array[jCont];
+            jCont--;
+        }
+
+        array[jCont + 1] = key;
+    }
 }
