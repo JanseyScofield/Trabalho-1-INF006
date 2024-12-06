@@ -432,7 +432,7 @@ double convStrNum (char* stringPonto, int* idx)
         {
             // soma ou subtrai a depender do valor de retorno em um número
             // na casa decimal atual - controlada pela variável div
-            retorno += retorno > 0 ? ((double) (stringPonto[*idx] - 48))/div : ((double) ((48 - stringPonto[*idx]) * -1))/div;
+            retorno += retorno > 0 ? ((double) (stringPonto[*idx] - 48))/div : ((double) ((stringPonto[*idx] - 48) * -1))/div;
             div *= (double) 10.0;
         }
         else 
