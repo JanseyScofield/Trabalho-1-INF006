@@ -26,6 +26,7 @@ void inicializarPonto(char *stringPonto, Ponto *ponto);
 void ordenarInts(int *array, int n);
 void ordenarFloats(float *array, int n);
 void ordenarPontos(Ponto *array, int n);
+void ordernarListaPalavras(char **array, int n);
 #pragma endregion
 
 int main(){
@@ -47,37 +48,33 @@ int main(){
     // fclose(entrada);
     // fclose(saida);
 
-    char *strPonto1 = "(-13.4,-1)";
-    Ponto novoPonto1;
-    inicializarPonto(strPonto1, &novoPonto1);
+    char palavra1[] = "joao";
 
-    char *strPonto2 = "(4,12.5)";
-    Ponto novoPonto2;
-    inicializarPonto(strPonto2, &novoPonto2);
+    char palavra2[] = "adan";
 
-    char *strPonto3 = "(-13.4,10)";
-    Ponto novoPonto3;
-    inicializarPonto(strPonto3, &novoPonto3);
+    char palavra3[] = "zirio";
 
-    Ponto array[] = {novoPonto1, novoPonto2, novoPonto3};
-    for(int i = 0; i < 3; i++){
-        for(int j =0; j < strlen(array[i].pontoStr); j++){
-            printf("%c", array[i].pontoStr[j]);
+    char palavra4[] = "mariana";
+
+    char *array[] = {palavra1, palavra2, palavra3, palavra4};
+    for(int i = 0; i < 4; i++){
+        for(int j =0; j < strlen(array[i]); j++){
+            printf("%c", array[i][j]);
         }
         printf(" ");
     }
     printf("\n");
-    ordenarPontos(array, 3);
-    for(int i = 0; i < 3; i++){
-        for(int j =0; j < strlen(array[i].pontoStr); j++){
-            printf("%c", array[i].pontoStr[j]);
+    ordernarListaPalavras(array, 4);
+    for(int i = 0; i < 4; i++){
+        for(int j =0; j < strlen(array[i]); j++){
+            printf("%c", array[i][j]);
         }
         printf(" ");
     }
     printf("\n");
     return 1;
 }
-
+#pragma region Utils
 int checarTipo(char *string){
     int iCont;
 
@@ -139,7 +136,9 @@ float stringParaNumero(char *string){
 
     return numero;
 }
+#pragma endregion
 
+#pragma region Pontos
 double distanciaEntrePontos(Ponto a, Ponto b){
     double quadradoDistancia = pow((b.x - a.x), 2) + pow((b.y - a.y), 2);
     return sqrt(quadradoDistancia);
@@ -168,8 +167,9 @@ void inicializarPonto(char *stringPonto, Ponto *ponto){
     ponto->y = stringParaNumero(stringY);
     ponto->distanciaOrigem = ponto->x < 0? distanciaEntrePontos(*ponto, origem) * -1 : distanciaEntrePontos(*ponto, origem);
 }
+#pragma endregion
 
-
+#pragma region Sorts
 void ordenarInts(int *array, int n){
     int iCont, jCont;
     int key;
@@ -220,3 +220,34 @@ void ordenarPontos(Ponto *array, int n){
         array[jCont + 1] = key;
     }
 }
+
+void ordernarListaPalavras(char **array, int n){
+    int iCont, jCont, kCont, atual;
+
+    for(iCont = 1; iCont < n; iCont++){
+        atual = 0;
+        char *key = malloc(sizeof(char) * (strlen(array[iCont]) + 1)); 
+        
+        for(kCont = 0; kCont < strlen(array[iCont]); kCont++){
+            key[kCont] = array[iCont][kCont];
+        }
+
+        jCont = iCont - 1;
+
+        while(jCont >= 0){
+            if(array[jCont][atual] == key[atual]){
+                atual++;
+            }
+            else if(array[jCont][atual] > key[atual]){
+                array[jCont + 1] = array[jCont];
+                jCont--;
+            }
+            else{
+                break;
+            }
+        }
+
+        array[jCont + 1] = key;
+    }
+}
+#pragma endregion
