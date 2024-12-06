@@ -51,6 +51,12 @@ void ordenarPontos(Ponto *array, int n);
 void ordernarListaPalavras(char **array, int n);
 #pragma endregion
 
+#pragma region Prints
+void escreverPontos(Ponto *pontos, int n, FILE *arquivoSaida);
+void escreverStrings(char *strings, int n, FILE *arquivoSaida);
+void escreverFloats(float *listaFloats, int n, FILE *arquivoSaida);
+#pragma endregion
+
 int main(){
 
     // FILE *entrada = fopen("L0Q1.in", "r");
@@ -270,6 +276,46 @@ void ordernarListaPalavras(char **array, int n){
         }
 
         array[jCont + 1] = key;
+    }
+}
+#pragma endregion
+
+#pragma region Prints
+void escreverPontos(Ponto *pontos, int n, FILE *arquivoSaida){
+   int iCont;
+
+    fputs("p:", arquivoSaida);
+    for(iCont = 0; iCont < n; iCont++){
+        fputs(pontos[iCont].pontoStr, arquivoSaida);
+        fputs(" ", arquivoSaida);
+    }
+}
+
+void escreverStrings(char *strings, int n, FILE *arquivoSaida){
+    int iCont;
+
+    fputs("str:", arquivoSaida);
+    for(iCont = 0; iCont < n; iCont++){
+        fputs(strings[iCont], arquivoSaida);
+        fputs(" ", arquivoSaida);    
+    }
+}
+
+void escreverFloats(float *listaFloats, int n, FILE *arquivoSaida){
+    int iCont;
+    
+    fputs("float:", arquivoSaida);
+    for(iCont = 0; iCont < n; iCont++){
+        fprintf(arquivoSaida,"%.2f ", listaFloats[iCont]);
+    }
+}
+
+void escreverInts(int *listaInts, int n, FILE *arquivoSaida){
+    int iCont;
+    
+    fputs("int:", arquivoSaida);
+    for(iCont = 0; iCont < n; iCont++){
+        fprintf(arquivoSaida,"%d ", listaInts[iCont]);
     }
 }
 #pragma endregion
