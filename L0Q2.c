@@ -25,6 +25,7 @@ void inicializarPonto(char *stringPonto, Ponto *ponto);
 #pragma region Sorts
 void ordenarInts(int *array, int n);
 void ordenarFloats(float *array, int n);
+void ordenarPontos(Ponto *array, int n);
 #pragma endregion
 
 int main(){
@@ -46,18 +47,32 @@ int main(){
     // fclose(entrada);
     // fclose(saida);
 
-    //char *strPonto = "(-13.4,-1)";
-    //Ponto novoPonto;
-    //inicializarPonto(strPonto, &novoPonto);
+    char *strPonto1 = "(-13.4,-1)";
+    Ponto novoPonto1;
+    inicializarPonto(strPonto1, &novoPonto1);
 
-    float array[] = {3.5,5.7, 90.0, 5.7, 12.34, 55, 67.44, -1.56 , -67, 100.12};
-    for(int i = 0; i < 10; i++){
-        printf("%.2f ", array[i]);
+    char *strPonto2 = "(4,12.5)";
+    Ponto novoPonto2;
+    inicializarPonto(strPonto2, &novoPonto2);
+
+    char *strPonto3 = "(-13.4,10)";
+    Ponto novoPonto3;
+    inicializarPonto(strPonto3, &novoPonto3);
+
+    Ponto array[] = {novoPonto1, novoPonto2, novoPonto3};
+    for(int i = 0; i < 3; i++){
+        for(int j =0; j < strlen(array[i].pontoStr); j++){
+            printf("%c", array[i].pontoStr[j]);
+        }
+        printf(" ");
     }
     printf("\n");
-    ordenarFloats(array, 10);
-     for(int i = 0; i < 10; i++){
-        printf("%.2f ", array[i]);
+    ordenarPontos(array, 3);
+    for(int i = 0; i < 3; i++){
+        for(int j =0; j < strlen(array[i].pontoStr); j++){
+            printf("%c", array[i].pontoStr[j]);
+        }
+        printf(" ");
     }
     printf("\n");
     return 1;
@@ -140,7 +155,6 @@ void inicializarPonto(char *stringPonto, Ponto *ponto){
     char *stringY = malloc(sizeof(char) * (strlen(stringPonto) - 3));
     for(iCont = 1, jCont = 0; stringPonto[iCont] != ','; iCont++, jCont++){
         stringX[jCont] = stringPonto[iCont];
-        printf("%c ", stringX[jCont]);
     }
   
     iCont++;
@@ -152,7 +166,7 @@ void inicializarPonto(char *stringPonto, Ponto *ponto){
     }
     ponto->x = stringParaNumero(stringX);
     ponto->y = stringParaNumero(stringY);
-    ponto->distanciaOrigem = distanciaEntrePontos(*ponto, origem);
+    ponto->distanciaOrigem = ponto->x < 0? distanciaEntrePontos(*ponto, origem) * -1 : distanciaEntrePontos(*ponto, origem);
 }
 
 
@@ -182,6 +196,23 @@ void ordenarFloats(float *array, int n){
         jCont = iCont - 1;
 
         while(array[jCont] > key &&  jCont >=0){
+            array[jCont + 1] = array[jCont];
+            jCont--;
+        }
+
+        array[jCont + 1] = key;
+    }
+}
+
+void ordenarPontos(Ponto *array, int n){
+    int iCont, jCont;
+    Ponto key;
+
+    for(iCont = 1; iCont < n; iCont++){
+        key = array[iCont];
+        jCont = iCont - 1;
+
+        while(array[jCont].distanciaOrigem > key.distanciaOrigem && jCont >=0){
             array[jCont + 1] = array[jCont];
             jCont--;
         }
