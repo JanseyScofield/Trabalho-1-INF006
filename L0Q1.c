@@ -52,9 +52,11 @@ int atribuirCoordenadasPonto(Ponto* structPonto, char* stringPonto, int* idx);
 double calcularDistanciaPontos(Ponto ponto1, Ponto ponto2);
 Ponto* obterPontosLista(char* linha, int* idx);
 void quickPontos (Ponto* pontoInicio, Ponto* pontoFinal); 
-void ordernarListaPontoDistanciaSelecao(Ponto* pontoInicio);
+void ordenarListaPonto(Ponto* pontoInicio);
 void trocarListaInfo(Ponto* ponto1, Ponto* ponto2);
 void trocarListaEncad(Ponto* ponto1, Ponto* ponto2);
+double obterSomaDistanciaPontos(Ponto* pontoInicio);
+double obterAtalhoPontos(Ponto* pontoInicio);
 
 #pragma endregion
 
@@ -108,6 +110,17 @@ void gerenciarLinha (char* linha)
     // teste
     imprimirCoordenadas(pontoInicio);
     //
+    
+    ordenarListaPonto(pontoInicio);
+    
+    printf("\nordenado:\n");
+    
+    double soma = obterSomaDistanciaPontos(pontoInicio);
+    double atalho = obterAtalhoPontos(pontoInicio);
+
+    imprimirCoordenadas(pontoInicio);
+    printf("\nsoma: %lf", soma);
+    printf("\natalho: %lf\n", atalho);
 }
 
 Ponto* obterPontosLista(char* linha, int* idx)
@@ -145,25 +158,25 @@ Ponto* adicionarPontoLista (Ponto* pontoInicio, Ponto* novoPonto)
     return novoPonto; 
 }
 
-double obterAtalhoPontos(Ponto* inicioPonto)
+double obterAtalhoPontos(Ponto* pontoInicio)
 {
-    Ponto* finalPonto;
-    for (finalPonto = inicioPonto; finalPonto->prox != NULL; finalPonto = finalPonto->prox);
+    Ponto* pontoFinal;
+    for (pontoFinal = pontoInicio; pontoFinal->prox != NULL; pontoFinal = pontoFinal->prox);
 
-    return calcularDistanciaPontos(*inicioPonto, *finalPonto);
+    return calcularDistanciaPontos(*pontoInicio, *pontoFinal);
 }
 
-double obterSomaDistanciaPontos(Ponto* inicioPonto)
+double obterSomaDistanciaPontos(Ponto* pontoInicio)
 {
     double soma = (double) 0;
-    if (inicioPonto == NULL)
+    if (pontoInicio == NULL)
         return soma;
 
     do 
     {
-        soma += calcularDistanciaPontos(*inicioPonto, *(inicioPonto->prox));
-        inicioPonto = inicioPonto->prox;
-    }while (inicioPonto->prox != NULL);
+        soma += calcularDistanciaPontos(*pontoInicio, *(pontoInicio->prox));
+        pontoInicio = pontoInicio->prox;
+    }while (pontoInicio->prox != NULL);
     
     return soma;
 }
@@ -172,7 +185,7 @@ double obterSomaDistanciaPontos(Ponto* inicioPonto)
 // distância até a origem
 double calcularDistanciaPontos(Ponto ponto1, Ponto ponto2)
 {
-    return sqrt(pow((ponto1.info.y - ponto2.info.y), 2) + pow((ponto1.info.x - ponto2.info.x), 2));
+    return sqrt(pow((double)(ponto2.info.x - ponto1.info.x), 2) + pow((double)(ponto2.info.y - ponto1.info.y), 2));
 };
 
 // Cria o ponto 0
@@ -279,7 +292,7 @@ void quickPontos (Ponto* pontoInicio, Ponto* pontoFinal) // pode começar chaman
 }
 
 // ordena a lista de pontos com base na distância até a origem
-void ordernarListaPontoDistanciaSelecao(Ponto* pontoInicio)
+void ordenarListaPonto(Ponto* pontoInicio)
 {
     Ponto* iPontoAtual;
     Ponto* jPontoAtual;
@@ -420,7 +433,9 @@ void imprimirCoordenadas (Ponto* pontoAtual)
 {
     while (pontoAtual != NULL)
     {
-        printf("%s\n", pontoAtual->info.coordenadaPonto);
+        printf("%s", pontoAtual->info.coordenadaPonto);
+        printf("  distância: %lf", pontoAtual->info.distanciaOrigem);
+        printf("  x: %lf; y: %lf\n", pontoAtual->info.x, pontoAtual->info.y);
         pontoAtual = pontoAtual->prox;
     }
 }
