@@ -5,12 +5,34 @@
 
 #define tam_maximo_linha (1000)
 
+#pragma region Structs
 typedef struct{
     char *pontoStr;
     float x;
     float y;
     double distanciaOrigem;
 } Ponto;
+
+typedef struct{
+    int *arrayInts;
+    int n; 
+} IntsLinha;
+
+typedef struct{
+    float *arrayFloats;
+    int n; 
+} FloatsLinha;
+
+typedef struct{
+    Ponto *arrayPontos;
+    int n; 
+} PontosLinha;
+
+typedef struct{
+    char *arrayStrings;
+    int n; 
+} StringsLinha;
+#pragma endregion
 
 #pragma region Utils
 int checarTipo(char *string);
