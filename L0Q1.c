@@ -153,6 +153,21 @@ double obterAtalhoPontos(Ponto* inicioPonto)
     return calcularDistanciaPontos(*inicioPonto, *finalPonto);
 }
 
+double obterSomaDistanciaPontos(Ponto* inicioPonto)
+{
+    double soma = (double) 0;
+    if (inicioPonto == NULL)
+        return soma;
+
+    do 
+    {
+        soma += calcularDistanciaPontos(*inicioPonto, *(inicioPonto->prox));
+        inicioPonto = inicioPonto->prox;
+    }while (inicioPonto->prox != NULL);
+    
+    return soma;
+}
+
 // Função para calcular distância entre pontos - basta passar o ponto0 para calcular
 // distância até a origem
 double calcularDistanciaPontos(Ponto ponto1, Ponto ponto2)
