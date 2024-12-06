@@ -364,6 +364,26 @@ int proximaCoordenada(char* stringPonto, int* idx)
         return true;
 };
 
+void montarNovaLinha(Ponto* pontoInicio, char* linha)
+{
+    int idx1 = 0;
+    int idx2;
+
+    proximaCoordenada(linha, &idx1);
+    
+    while(proximaCoordenada(linha, &idx1) != '\n')
+    {
+        idx2 = 0;
+        while (pontoInicio->info.coordenadaPonto[idx2] != ')')
+            linha[idx1++] = pontoInicio->info.coordenadaPonto[idx2++];
+        
+        linha[idx1] = ')';
+
+        pontoInicio = pontoInicio->prox;
+    }
+}
+
+
 // obtém a substring equivalente ao início da string passada até o separador
 char* obterSubstring(char* stringPonto, char separador, int idx)
 {
