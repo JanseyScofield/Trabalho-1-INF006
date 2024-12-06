@@ -145,6 +145,14 @@ Ponto* adicionarPontoLista (Ponto* pontoInicio, Ponto* novoPonto)
     return novoPonto; 
 }
 
+double obterAtalhoPontos(Ponto* inicioPonto)
+{
+    Ponto* finalPonto;
+    for (finalPonto = inicioPonto; finalPonto->prox != NULL; finalPonto = finalPonto->prox);
+
+    return calcularDistanciaPontos(*inicioPonto, *finalPonto);
+}
+
 // Função para calcular distância entre pontos - basta passar o ponto0 para calcular
 // distância até a origem
 double calcularDistanciaPontos(Ponto ponto1, Ponto ponto2)
