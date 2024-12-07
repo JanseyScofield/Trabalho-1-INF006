@@ -35,7 +35,7 @@ struct ponto {
 #pragma region FUNÇÕES
 
 // principal
-void gerenciarLinha (char* linha);
+void gerenciarLinha (char* linha, FILE* saida);
 
 // relacionadas à strings
 double convStrNum(char* stringPonto, int* idx);
@@ -44,6 +44,7 @@ char* obterSubstring(char* stringPonto, char separador, int idx);
 int proximaCoordenada(char* stringPonto, int* idx);
 // teste
 void imprimirCoordenadas (Ponto* pontoAtual);
+void montarNovaLinha(Ponto* pontoInicio, char* linha);
 
 // relacionadas à estrutura de pontos
 Ponto criarPonto0();
@@ -88,8 +89,7 @@ int main(){
     //
     
     while(fgets(linha, TAM_MAX_LINHA,  entrada) != NULL){
-        gerenciarLinha(linha);
-        fputs(linha, saida);
+        gerenciarLinha(linha, saida);
     }
 
     fclose(entrada);
@@ -99,7 +99,7 @@ int main(){
 }
 
 // Gerencia a lógica do programa para a linha atual
-void gerenciarLinha (char* linha)
+void gerenciarLinha (char* linha, FILE* saida)
 {
     // indexador
     int idx = 0; 
@@ -110,13 +110,17 @@ void gerenciarLinha (char* linha)
     // teste
     imprimirCoordenadas(pontoInicio);
     //
-    
     ordenarListaPonto(pontoInicio);
     
     printf("\nordenado:\n");
     
     double soma = obterSomaDistanciaPontos(pontoInicio);
     double atalho = obterAtalhoPontos(pontoInicio);
+    
+    montarNovaLinha(pontoInicio, linha);
+    
+    fprintf(saida, linha, soma, atalho);
+    fprintf(saida, "\n"); 
 
     imprimirCoordenadas(pontoInicio);
     printf("\nsoma: %lf", soma);
@@ -354,11 +358,11 @@ void trocarListaEncad(Ponto* ponto1, Ponto* ponto2)
 int proximaCoordenada(char* stringPonto, int* idx)
 {
     // encontra próxima coordenada ou o final da linha
-    while (stringPonto[*idx] != '(' && stringPonto[*idx] != '\n')
+    while (stringPonto[*idx] != '(' && stringPonto[*idx] != '\n' && stringPonto[*idx] != 0) 
         *idx += 1;
     
     // verifica se a linha acabou
-    if (stringPonto[*idx] == '\n')
+    if (stringPonto[*idx] == '\n' || stringPonto[*idx] == 0) 
         return false;
     else
         return true;
@@ -370,17 +374,27 @@ void montarNovaLinha(Ponto* pontoInicio, char* linha)
     int idx2;
 
     proximaCoordenada(linha, &idx1);
-    
-    while(proximaCoordenada(linha, &idx1) != '\n')
+
+    while(linha[idx1] != '\n' && pontoInicio != NULL)
     {
+        linha[idx1] = ' ';
+
         idx2 = 0;
         while (pontoInicio->info.coordenadaPonto[idx2] != ')')
             linha[idx1++] = pontoInicio->info.coordenadaPonto[idx2++];
         
-        linha[idx1] = ')';
+        linha[idx1++] = ')';
+        
+        linha[idx1++] = ' ';
 
         pontoInicio = pontoInicio->prox;
     }
+    
+    char finalLinha[] = "distance: %0.2lf shortcut: %0.2lf\n";
+
+    for (idx2 = 0; finalLinha[idx2] != '\n'; idx2++, idx1++)
+        linha[idx1] = finalLinha[idx2];
+    
 }
 
 
