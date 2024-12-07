@@ -303,26 +303,38 @@ void ordernarListaPalavras(char **array, int n){
     for(iCont = 1; iCont < n; iCont++){
         atual = 0;
         char *key = malloc(sizeof(char) * (strlen(array[iCont]) + 1)); 
-        
+        char *auxKey = malloc(sizeof(char) * (strlen(array[iCont]) + 1));
+
         for(kCont = 0; kCont < strlen(array[iCont]); kCont++){
             key[kCont] = array[iCont][kCont];
+        }
+
+        for(kCont = 0; kCont < strlen(array[iCont]); kCont++){
+            auxKey[kCont] = array[iCont][kCont] >= 'A' && array[iCont][kCont] <= 'Z'? array[iCont][kCont] + ' ': array[iCont][kCont] ;
         }
 
         jCont = iCont - 1;
 
         while(jCont >= 0){
-            if(array[jCont][atual] == key[atual]){
+            char *aux = malloc(sizeof(char) * strlen(array[jCont]) + 1);
+            
+            for(kCont = 0; kCont < strlen(array[iCont]); kCont++){
+                aux[kCont] = array[jCont][kCont] >= 'A' && array[jCont][kCont] <= 'Z'? array[jCont][kCont] + ' ': array[jCont][kCont] ;
+            }
+
+            if(aux[atual] == auxKey[atual]){
                 atual++;
             }
-            else if(array[jCont][atual] > key[atual]){
+            else if(aux[atual] > auxKey[atual]){
                 array[jCont + 1] = array[jCont];
+                atual = 0;
                 jCont--;
             }
             else{
                 break;
             }
         }
-
+        
         array[jCont + 1] = key;
     }
 }
