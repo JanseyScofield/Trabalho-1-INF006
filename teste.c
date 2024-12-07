@@ -39,8 +39,8 @@ int main(){
     //char *strPonto = "(-13.4,-1)";
     //Ponto novoPonto;
     //inicializarPonto(strPonto, &novoPonto);
-    char *num1Str = "-1";
-    char *num2Str = "13.4";
+    char *num1Str = "1.2";
+    char *num2Str = "-13.45";
     float num1, num2;
     num1 = stringParaNumero(num1Str);
     num2 = stringParaNumero(num2Str);
@@ -54,79 +54,46 @@ int main(){
 }
 
 float stringParaNumero(char *string){
-    int iCont, tamString = strlen(string);
+    int iCont, tamString = strlen(string), tamSemSinal;
     float numero = 0;
     float base = 1;
     int casaPonto = -1;    
 
-    if(string[0] == '-'){
-        tamString--;
+    iCont = 0;
+    tamSemSinal = tamString;
+
+    if(string[iCont] == '-'){
+        iCont++;
+        tamSemSinal--;
+    }
+
+    if(tamSemSinal > 1){
+        while(iCont < tamString){
+            if(string[iCont] == '.'){
+                casaPonto = iCont;
+                iCont++;
+                continue;
+            }
+
+            base *= 10;
+            iCont++;
+        }
+
+        if(casaPonto != -1){
+            for(iCont = casaPonto + 1; iCont <= tamString; iCont++){
+                base /= 10;
+            }
+        }
     }
     
-    iCont = 1;
-    while(iCont <= tamString){
-        if(string[iCont] == '.'){
-            casaPonto = iCont;
-            iCont++;
-            continue;
-        }
-        
-        base *= 10;
-        iCont++;
-    }
-
-    //printf("Casa ponto : %d", casaPonto);
-    if(casaPonto != -1){
-        for(iCont = casaPonto + 1; iCont <= tamString; iCont++){
-            base /= 10;
-        }
-    }
-
-    //printf("Base %f", base);
-    iCont = 0;
+    iCont = 0; 
     while(iCont < tamString){
-        if(string[iCont] != '.'){
-            numero += (string[iCont] - '0') * base;
+        if(string[iCont] != '.' && string[iCont] != '-'){
+            numero +=  string[0] == '-' ? ((string[iCont] - '0') * base) * -1.0 : (string[iCont] - '0') * base;
             base /= 10;
         }
         iCont++;
     } 
 
     return numero;
-}
-
-double distanciaEntrePontos(Ponto a, Ponto b){
-    double quadradoDistancia = pow((b.x - a.x), 2) + pow((b.y - a.y), 2);
-    return sqrt(quadradoDistancia);
-}
-
-void inicializarPonto(char *stringPonto, Ponto *ponto){
-    int iCont, jCont;
-    Ponto origem;
-    origem.x = 0;
-    origem.y = 0;
-
-    ponto->pontoStr = stringPonto;
-    char *stringX = malloc(sizeof(char) * (strlen(stringPonto) - 3));
-    char *stringY = malloc(sizeof(char) * (strlen(stringPonto) - 3));
-
-    for(iCont = 1, jCont = 0; stringPonto[iCont] != ','; iCont++, jCont++){
-        stringX[jCont] = stringPonto[iCont];
-        printf("%c ", stringX[jCont]);
-    }
-
-    // for(int i = 0; i < strlen(stringX); i++){
-    //     printf("%c ", stringX[i]);
-    // }
-    iCont++;
-    jCont = 0;
-    while(stringPonto[iCont] != ')'){
-        stringY[jCont] = stringPonto[iCont];
-        iCont++;
-        jCont++;
-    }
-
-    ponto->x = stringParaNumero(stringX);
-    ponto->y = stringParaNumero(stringY);
-    ponto->distanciaOrigem = distanciaEntrePontos(*ponto, origem);
 }
