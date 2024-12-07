@@ -4,7 +4,7 @@
 #include <math.h>
 
 #define tam_maximo_linha (1000)
-
+#define qtd_itens_tipo (200)
 #pragma region Structs
 typedef struct{
     char *pontoStr;
@@ -29,7 +29,7 @@ typedef struct{
 } PontosLinha;
 
 typedef struct{
-    char *arrayStrings;
+    char **arrayStrings;
     int n; 
 } StringsLinha;
 #pragma endregion
@@ -53,53 +53,101 @@ void ordernarListaPalavras(char **array, int n);
 
 #pragma region Prints
 void escreverPontos(Ponto *pontos, int n, FILE *arquivoSaida);
-void escreverStrings(char *strings, int n, FILE *arquivoSaida);
+void escreverStrings(char **strings, int n, FILE *arquivoSaida);
 void escreverFloats(float *listaFloats, int n, FILE *arquivoSaida);
+void escreverInts(int *listaInts, int n, FILE *arquivoSaida);
 #pragma endregion
 
 int main(){
+    FILE *entrada = fopen("L0Q2.in", "r");
+    FILE *saida = fopen("L0Q2.out", "w");
 
-    // FILE *entrada = fopen("L0Q1.in", "r");
-    // FILE *saida = fopen("L0Q1.out", "w");
-
-    // if(entrada == NULL || saida == NULL){
-    //     printf("Erro ao abrir os arquivos.");
-    //     return 0;
-    // }
-
-    // char *linha = malloc(sizeof(char) * tam_maximo_linha);
-
-    // while(fgets(linha, tam_maximo_linha, entrada) != NULL){
-        
-    // }
-
-    // fclose(entrada);
-    // fclose(saida);
-
-    char palavra1[] = "joao";
-
-    char palavra2[] = "adan";
-
-    char palavra3[] = "zirio";
-
-    char palavra4[] = "mariana";
-
-    char *array[] = {palavra1, palavra2, palavra3, palavra4};
-    for(int i = 0; i < 4; i++){
-        for(int j =0; j < strlen(array[i]); j++){
-            printf("%c", array[i][j]);
-        }
-        printf(" ");
+    if(entrada == NULL || saida == NULL){
+        printf("Erro ao abrir os arquivos.");
+        return 0;
     }
-    printf("\n");
-    ordernarListaPalavras(array, 4);
-    for(int i = 0; i < 4; i++){
-        for(int j =0; j < strlen(array[i]); j++){
-            printf("%c", array[i][j]);
+
+    char *linha = malloc(sizeof(char) * tam_maximo_linha);
+
+    while(fgets(linha, tam_maximo_linha, entrada) != NULL){
+        int iCont, jCont, kCont, tipoAtual;
+        int tamanhoStringAtual;
+
+        PontosLinha pontosLista;
+        pontosLista.arrayPontos = malloc(sizeof(Ponto) * qtd_itens_tipo);
+        pontosLista.n = 0;
+
+        StringsLinha stringLinha;
+        stringLinha.arrayStrings = malloc(sizeof(char*) * qtd_itens_tipo);
+        stringLinha.n = 0;
+
+        FloatsLinha floatsLinha;
+        floatsLinha.arrayFloats = malloc(sizeof(float) * qtd_itens_tipo);
+        floatsLinha.n = 0;
+
+        IntsLinha intsLinha;
+        intsLinha.arrayInts = malloc(sizeof(int) * qtd_itens_tipo);
+        intsLinha.n = 0;
+
+        int inicio = 0, fim = 0, tamanho;
+        while (linha[fim] != '\0') {
+            while (linha[fim] != ' ' && linha[fim] != '\n' && linha[fim] != '\0') {
+                fim++;
+            }
+
+            tamanho = fim - inicio;
+
+            if (tamanho > 0) {
+                char *stringAtual = malloc((tamanho + 1) * sizeof(char));
+                for(kCont = 0; kCont < tamanho; kCont++){
+                    stringAtual[kCont] = linha[inicio + kCont];
+                }
+                stringAtual[tamanho] = '\0';
+
+                int tipoAtual = checarTipo(stringAtual);
+
+                switch (tipoAtual) {
+                    case 1: {
+                        Ponto novoPonto;
+                        inicializarPonto(stringAtual, &novoPonto);
+                        pontosLista.arrayPontos[pontosLista.n++] = novoPonto;
+                        break;
+                    }
+                    case 2:
+                        stringLinha.arrayStrings[stringLinha.n++] = stringAtual;
+                        break;
+                    case 3:
+                        floatsLinha.arrayFloats[floatsLinha.n++] = stringParaNumero(stringAtual);
+                        free(stringAtual);
+                        break;
+                    case 4:
+                        intsLinha.arrayInts[intsLinha.n++] = (int)stringParaNumero(stringAtual);
+                        free(stringAtual);
+                        break;
+                }
+            }
+            
+            while (linha[fim] == ' ' || linha[fim] == '\n') {
+                fim++;
+            }
+            inicio = fim;
         }
-        printf(" ");
+
+        ordernarListaPalavras(stringLinha.arrayStrings, stringLinha.n);
+        ordenarInts(intsLinha.arrayInts, intsLinha.n);
+        ordenarFloats(floatsLinha.arrayFloats, floatsLinha.n);
+        ordenarPontos(pontosLista.arrayPontos, pontosLista.n);
+
+        escreverStrings(stringLinha.arrayStrings, stringLinha.n, saida);
+        escreverInts(intsLinha.arrayInts, intsLinha.n, saida);
+        escreverFloats(floatsLinha.arrayFloats, floatsLinha.n, saida);
+        escreverPontos(pontosLista.arrayPontos, pontosLista.n, saida);
+        fputs("\n", saida);
     }
-    printf("\n");
+
+    fgetc(saida);
+    fclose(entrada);
+    fclose(saida);
     return 1;
 }
 #pragma region Utils
@@ -284,38 +332,48 @@ void ordernarListaPalavras(char **array, int n){
 void escreverPontos(Ponto *pontos, int n, FILE *arquivoSaida){
    int iCont;
 
-    fputs("p:", arquivoSaida);
+    fputs(" p:", arquivoSaida);
     for(iCont = 0; iCont < n; iCont++){
+        if(iCont != 0){
+            fputs(" ", arquivoSaida);
+        }
         fputs(pontos[iCont].pontoStr, arquivoSaida);
-        fputs(" ", arquivoSaida);
     }
 }
 
-void escreverStrings(char *strings, int n, FILE *arquivoSaida){
+void escreverStrings(char **strings, int n, FILE *arquivoSaida){
     int iCont;
 
     fputs("str:", arquivoSaida);
     for(iCont = 0; iCont < n; iCont++){
-        fputs(strings[iCont], arquivoSaida);
-        fputs(" ", arquivoSaida);    
+        if(iCont != 0){
+            fputs(" ", arquivoSaida);
+        }
+        fputs(strings[iCont], arquivoSaida); 
     }
 }
 
 void escreverFloats(float *listaFloats, int n, FILE *arquivoSaida){
     int iCont;
     
-    fputs("float:", arquivoSaida);
+    fputs(" float:", arquivoSaida);
     for(iCont = 0; iCont < n; iCont++){
-        fprintf(arquivoSaida,"%.2f ", listaFloats[iCont]);
+        if(iCont != 0){
+            fputs(" ", arquivoSaida);
+        }
+        fprintf(arquivoSaida,"%.2f", listaFloats[iCont]);
     }
 }
 
 void escreverInts(int *listaInts, int n, FILE *arquivoSaida){
     int iCont;
     
-    fputs("int:", arquivoSaida);
+    fputs(" int:", arquivoSaida);
     for(iCont = 0; iCont < n; iCont++){
-        fprintf(arquivoSaida,"%d ", listaInts[iCont]);
+        if(iCont != 0){
+            fputs(" ", arquivoSaida);
+        }
+        fprintf(arquivoSaida,"%d", listaInts[iCont]);
     }
 }
 #pragma endregion
