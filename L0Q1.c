@@ -110,12 +110,13 @@ void gerenciarLinha (char* linha, FILE* saida)
     // teste
     imprimirCoordenadas(pontoInicio);
     //
-    ordenarListaPonto(pontoInicio);
     
     printf("\nordenado:\n");
     
     double soma = obterSomaDistanciaPontos(pontoInicio);
     double atalho = obterAtalhoPontos(pontoInicio);
+
+    ordenarListaPonto(pontoInicio);
     
     montarNovaLinha(pontoInicio, linha);
     
@@ -390,7 +391,7 @@ void montarNovaLinha(Ponto* pontoInicio, char* linha)
         pontoInicio = pontoInicio->prox;
     }
     
-    char finalLinha[] = "distance: %0.2lf shortcut: %0.2lf\n";
+    char finalLinha[] = "distance %0.2lf shortcut %0.2lf\n";
 
     for (idx2 = 0; finalLinha[idx2] != '\n'; idx2++, idx1++)
         linha[idx1] = finalLinha[idx2];
