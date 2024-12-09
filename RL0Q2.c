@@ -118,15 +118,14 @@ int main(){
                         break;
                     case 3:
                         floatsLinha.arrayFloats[floatsLinha.n++] = stringParaNumero(stringAtual);
-                        free(stringAtual);
                         break;
                     case 4:
                         intsLinha.arrayInts[intsLinha.n++] = (int)stringParaNumero(stringAtual);
-                        free(stringAtual);
                         break;
                 }
+                
             }
-            
+                
             while (linha[fim] == ' ' || linha[fim] == '\n') {
                 fim++;
             }
@@ -169,48 +168,37 @@ int checarTipo(char *string){
 }
 
 float stringParaNumero(char *string){
-    int iCont, tamString = strlen(string), tamSemSinal;
-    float numero = 0;
-    float base = 1;
-    int casaPonto = -1;    
+    int iCont, tamString = strlen(string);
+    float numero = 0.0;
+    float base = 1.0;
+    int casaPonto = -1;
+    int sinal = 1;
 
     iCont = 0;
-    tamSemSinal = tamString;
 
     if(string[iCont] == '-'){
+        sinal = -1;
         iCont++;
-        tamSemSinal--;
     }
 
-    if(tamSemSinal > 1){
-        while(iCont < tamString){
-            if(string[iCont] == '.'){
-                casaPonto = iCont;
-                iCont++;
-                continue;
-            }
-
-            base *= 10;
-            iCont++;
-        }
-
-        if(casaPonto != -1){
-            for(iCont = casaPonto + 1; iCont <= tamString; iCont++){
-                base /= 10;
-            }
-        }
-    }
-    
-    iCont = 0; 
     while(iCont < tamString){
-        if(string[iCont] != '.' && string[iCont] != '-'){
-            numero +=  string[0] == '-' ? ((string[iCont] - '0') * base) * -1.0 : (string[iCont] - '0') * base;
-            base /= 10;
+        if(string[iCont] == '.'){
+            casaPonto = iCont;
+            iCont++;
+            continue;
         }
-        iCont++;
-    } 
 
-    return numero;
+        if(casaPonto == -1) {
+            numero = numero * 10 + (string[iCont] - '0');
+        } else {
+            base /= 10;
+            numero += (string[iCont] - '0') * base;
+        }
+
+        iCont++;
+    }
+
+    return numero * sinal;
 }
 #pragma endregion
 
@@ -241,7 +229,7 @@ void inicializarPonto(char *stringPonto, Ponto *ponto){
     }
     ponto->x = stringParaNumero(stringX);
     ponto->y = stringParaNumero(stringY);
-    ponto->distanciaOrigem = ponto->x < 0? distanciaEntrePontos(*ponto, origem) * -1 : distanciaEntrePontos(*ponto, origem);
+    ponto->distanciaOrigem =distanciaEntrePontos(*ponto, origem);
 }
 #pragma endregion
 
@@ -303,38 +291,26 @@ void ordernarListaPalavras(char **array, int n){
     for(iCont = 1; iCont < n; iCont++){
         atual = 0;
         char *key = malloc(sizeof(char) * (strlen(array[iCont]) + 1)); 
-        char *auxKey = malloc(sizeof(char) * (strlen(array[iCont]) + 1));
-
+        
         for(kCont = 0; kCont < strlen(array[iCont]); kCont++){
             key[kCont] = array[iCont][kCont];
-        }
-
-        for(kCont = 0; kCont < strlen(array[iCont]); kCont++){
-            auxKey[kCont] = array[iCont][kCont] >= 'A' && array[iCont][kCont] <= 'Z'? array[iCont][kCont] + ' ': array[iCont][kCont] ;
         }
 
         jCont = iCont - 1;
 
         while(jCont >= 0){
-            char *aux = malloc(sizeof(char) * strlen(array[jCont]) + 1);
-            
-            for(kCont = 0; kCont < strlen(array[iCont]); kCont++){
-                aux[kCont] = array[jCont][kCont] >= 'A' && array[jCont][kCont] <= 'Z'? array[jCont][kCont] + ' ': array[jCont][kCont] ;
-            }
-
-            if(aux[atual] == auxKey[atual]){
+            if(array[jCont][atual] == key[atual]){
                 atual++;
             }
-            else if(aux[atual] > auxKey[atual]){
+            else if(array[jCont][atual] > key[atual]){
                 array[jCont + 1] = array[jCont];
-                atual = 0;
                 jCont--;
             }
             else{
                 break;
             }
         }
-        
+
         array[jCont + 1] = key;
     }
 }
@@ -373,7 +349,7 @@ void escreverFloats(float *listaFloats, int n, FILE *arquivoSaida){
         if(iCont != 0){
             fputs(" ", arquivoSaida);
         }
-        fprintf(arquivoSaida,"%.2f", listaFloats[iCont]);
+        fprintf(arquivoSaida,"%g", listaFloats[iCont]);
     }
 }
 
